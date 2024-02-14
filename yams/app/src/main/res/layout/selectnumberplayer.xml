@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="498dp"
+        android:layout_height="814dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.506"
+        app:srcCompat="@drawable/jeu_fond_couleur_127657_11045"
+        tools:ignore="ContentDescription" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="204dp"
+        android:layout_height="271dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.753"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.584">
+
+        <RadioButton
+            android:id="@+id/onePlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FF0000"
+            android:fontFamily="sans-serif-black"
+            android:text="1 joueur"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="30sp"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/twoPlayers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FF0000"
+            android:fontFamily="sans-serif-black"
+            android:text="2 joueurs"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="30sp"
+            tools:ignore="HardcodedText" />
+
+
+        <RadioButton
+            android:id="@+id/threePlayers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FF0000"
+            android:fontFamily="sans-serif-black"
+            android:text="3 joueurs"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="30sp"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/fourPlayers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTintMode="add"
+            android:fontFamily="sans-serif-black"
+            android:text="4 joueurs"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="30sp"
+            tools:ignore="HardcodedText" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/jouerplayer"
+        android:layout_width="172dp"
+        android:layout_height="82dp"
+        android:backgroundTint="#FF0000"
+        android:text="Jouer"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.752"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="HardcodedText" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
