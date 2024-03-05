@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class DiceActivity extends AppCompatActivity {
@@ -65,10 +64,10 @@ public class DiceActivity extends AppCompatActivity {
     private void onBackToScoreClicked() {
         Intent returnIntent = new Intent();
         returnIntent.putExtra("diceValues", getDiceValues());
-        returnIntent.putExtra("scoreCategory", "VotreCatégorieDeScore");
         setResult(RESULT_OK, returnIntent);
         finish();
     }
+
 
 
     private void initializeDiceImages() {

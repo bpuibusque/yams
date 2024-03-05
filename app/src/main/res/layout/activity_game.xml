@@ -2,25 +2,53 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
         <TableLayout
-            android:id="@+id/tableLayout"
+            android:id="@+id/scoreTableLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </TableLayout>
+            android:layout_height="wrap_content"/>
     </ScrollView>
 
+    <LinearLayout
+        android:id="@+id/diceImagesLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="16dp">
+        <!-- Les images des dés seront ajoutées ici dynamiquement -->
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/launchCounterTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lancers: 0"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"/>
+
     <Button
-        android:id="@+id/btnGoToDice"
+        android:id="@+id/rollDiceButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Lancer les dés"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+    <Button
+        android:id="@+id/validateSelectionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Valider la sélection"
+        android:layout_marginBottom="10dp"
+        android:enabled="false"/>
+
 </LinearLayout>
