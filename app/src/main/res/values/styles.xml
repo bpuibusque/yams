@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TableCellStyle">
+        <item name="android:layout_margin">4dp</item> <!-- Augmenter l'espacement -->
+        <item name="android:padding">12dp</item> <!-- Augmenter le padding pour un texte plus aéré -->
+        <item name="android:textSize">18sp</item> <!-- Taille de la police agrandie -->
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/table_cell_background</item> <!-- Optionnel: pour ajouter un fond à chaque cellule -->
+    </style>
+
+    <style name="TableHeaderStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item> <!-- Police plus grande pour les en-têtes -->
+    </style>
+
+</resources>

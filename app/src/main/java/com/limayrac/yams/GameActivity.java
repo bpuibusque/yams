@@ -1,5 +1,8 @@
 package com.limayrac.yams;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -17,6 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -29,7 +33,7 @@ public class GameActivity extends AppCompatActivity {
     private Random random = new Random();
 
     private TextView launchCounterTextView;
-    private Button rollDiceButton, validateSelectionButton;
+    private Button rollDiceButton;
     private LinearLayout diceContainer;
     private TableLayout scoreTableLayout;
 
@@ -38,33 +42,24 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Récupérer le nombre de joueurs passé par l'intent de l'activité précédente
         int numberOfPlayers = getIntent().getIntExtra("numberOfPlayers", 1);
 
-        // Initialiser l'interface utilisateur et configurer les écouteurs d'événements
         initializeUI();
-
-        // Configurer les dés et le tableau des scores en fonction du nombre de joueurs
         setupDiceImages();
         setupScoreTable(numberOfPlayers);
     }
 
     private void initializeUI() {
-        // Initialisation des composants de l'interface utilisateur à partir du layout
         diceContainer = findViewById(R.id.diceImagesLayout);
         scoreTableLayout = findViewById(R.id.scoreTableLayout);
         launchCounterTextView = findViewById(R.id.launchCounterTextView);
         rollDiceButton = findViewById(R.id.rollDiceButton);
-        validateSelectionButton = findViewById(R.id.validateSelectionButton);
+        //validateSelectionButton = findViewById(R.id.validateSelectionButton);
 
-        // Configuration des écouteurs d'événements pour les boutons
         rollDiceButton.setOnClickListener(v -> rollDice());
-        validateSelectionButton.setOnClickListener(v -> validateSelection());
-
-        // Au début, le bouton de validation est désactivé jusqu'à ce que les dés soient lancés
-        validateSelectionButton.setEnabled(false);
+        //validateSelectionButton.setOnClickListener(v -> validateSelection());
+        //validateSelectionButton.setEnabled(false);
     }
-
     private void rollDice() {
         if (launchCount < MAX_LAUNCHES) {
             for (int i = 0; i < 5; i++) {
@@ -79,14 +74,10 @@ public class GameActivity extends AppCompatActivity {
 
         if (launchCount == MAX_LAUNCHES) {
             rollDiceButton.setEnabled(false); // Désactive le bouton après le nombre maximum de lancers
-            validateSelectionButton.setEnabled(true); // Active le bouton de validation pour permettre le choix du score
+           // validateSelectionButton.setEnabled(true); // Active le bouton de validation pour permettre le choix du score
         }
     }
 
-    private void toggleDiceSelection(int index) {
-        diceToKeep[index] = !diceToKeep[index]; // Basculer l'état de conservation du dé
-        updateDiceAppearance(index); // Mettre à jour l'apparence du dé
-    }
 
     private void updateDiceImages() {
         for (int i = 0; i < diceImages.length; i++) {
@@ -94,16 +85,23 @@ public class GameActivity extends AppCompatActivity {
             diceImages[i].setImageResource(resId);
         }
     }
+    private void toggleDiceSelection(int index) {
+        diceToKeep[index] = !diceToKeep[index];
+        updateDiceAppearance(index);
+        // Ajoutez un log ou un Toast ici pour tester
+        Toast.makeText(this, "Dé " + (index + 1) + (diceToKeep[index] ? " sélectionné" : " désélectionné"), Toast.LENGTH_SHORT).show();
+    }
+
 
     private void updateDiceAppearance(int index) {
         if (diceToKeep[index]) {
-            // Si le dé doit être conservé, on peut par exemple changer le fond pour indiquer sa sélection
-            diceImages[index].setBackground(ContextCompat.getDrawable(this, R.drawable.selected_dice_border)); // Assurez-vous que `dice_selected_background` est défini dans vos ressources drawable
+            diceImages[index].setBackgroundResource(R.drawable.selected_dice_border);
         } else {
-            // Sinon, on rétablit l'apparence par défaut
             diceImages[index].setBackground(null);
         }
     }
+
+
 
     private void setupDiceImages() {
         diceContainer = findViewById(R.id.diceImagesLayout);
@@ -119,46 +117,76 @@ public class GameActivity extends AppCompatActivity {
             diceImage.setMaxWidth(100);
             // Définir une image par défaut pour le dé
             diceImage.setImageResource(R.drawable.dice_face_1); // Image par défaut
-            int finalI = i;
+            int finalI = i; // Nécessaire pour être utilisé dans une expression lambda
             diceImage.setOnClickListener(v -> toggleDiceSelection(finalI));
-            diceContainer.addView(diceImage); // Ajouter l'ImageView au LinearLayout
-            diceImages[i] = diceImage; // Stocker la référence de l'ImageView dans le tableau
+            diceContainer.addView(diceImage);
+            diceImages[i] = diceImage;
         }
+        updateDiceImages();
     }
 
     private void setupScoreTable(int numberOfPlayers) {
-        scoreTableLayout = findViewById(R.id.scoreTableLayout); // Assurez-vous que scoreTableLayout est votre TableLayout
+        scoreTableLayout.removeAllViews(); // Assurez-vous de nettoyer le tableau avant de le remplir à nouveau
 
-        // Liste des catégories de score
         String[] categories = {
-                "1", "2", "3", "4", "5", "6",
-                "Total", "Bonus", "Total intermédiaire",
-                "Brelan", "Carré", "Full House",
-                "Petite Suite", "Grande Suite",
-                "Yam", "Chance", "Total final"
+                "1", "2", "3", "4", "5", "6", "Total", "Bonus", "Total intermédiaire",
+                "Brelan", "Carré", "Full House", "Petite Suite", "Grande Suite", "Yam", "Chance", "Total final"
         };
+
+        List<String> autoCategories = Arrays.asList("Total", "Bonus", "Total intermédiaire", "Total final");
 
         for (String category : categories) {
             TableRow row = new TableRow(this);
+            row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
             TextView textView = new TextView(this);
             textView.setText(category);
-            textView.setPadding(5, 5, 5, 5); // Exemple de padding
+            textView.setGravity(Gravity.CENTER);
+            textView.setPadding(5, 15, 5, 15);
+            textView.setTypeface(null, Typeface.BOLD);
             row.addView(textView);
 
-            // Ajouter une TextView pour chaque joueur
             for (int i = 0; i < numberOfPlayers; i++) {
+                final int playerIndex = i;
                 TextView scoreView = new TextView(this);
-                scoreView.setText("0"); // Initialiser tous les scores à 0
+                scoreView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
                 scoreView.setGravity(Gravity.CENTER);
-                scoreView.setPadding(5, 5, 5, 5);
+                scoreView.setPadding(5, 15, 5, 15);
+                scoreView.setText("0");
+                scoreView.setTag(category);
+
+                if (!autoCategories.contains(category)) {
+                    scoreView.setOnClickListener(v -> showScoreDialog(scoreView, category, playerIndex));
+                }
+
                 row.addView(scoreView);
             }
 
-            scoreTableLayout.addView(row); // Ajouter la ligne au TableLayout
+            scoreTableLayout.addView(row);
         }
     }
 
-    private void validateSelection() {
+    private void showScoreDialog(TextView scoreView, String category, int playerIndex) {
+        final int potentialScore = calculateScoreForCategory(category, diceValues);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+        builder.setTitle("Confirmer le score");
+        builder.setMessage("Voulez-vous ajouter " + potentialScore + " points à " + category + " ?");
+        builder.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                scoreView.setText(String.valueOf(potentialScore));
+                // Mettre à jour le score dans la logique de l'application ici
+                updateScoreInTable(category, potentialScore, playerIndex);
+                resetForNextTurn();
+            }
+        });
+        builder.setNegativeButton("Non", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+
+
+    /*private void validateSelection() {
         // Cette méthode doit être modifiée pour capturer la catégorie sélectionnée par l'utilisateur.
         // Pour cet exemple, "Full House" est sélectionné par défaut.
         String selectedCategory = "Full House"; // Ceci doit être remplacé par la catégorie réellement sélectionnée.
@@ -173,7 +201,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Réinitialiser pour le prochain tour
         resetForNextTurn();
-    }
+    }*/
 
     // Vérification des différentes combinaisons
     private boolean hasFullHouse() {
@@ -246,18 +274,31 @@ public class GameActivity extends AppCompatActivity {
         return total;
     }
 
-    private void updateScoreInTable(String category, int score) {
-        // Cette méthode doit être implémentée pour mettre à jour l'interface utilisateur
-        // avec le score calculé. Ceci peut impliquer de trouver la vue correspondante
-        // dans le TableLayout et de mettre à jour son contenu.
+    private void updateScoreInTable(String category, int score, int playerIndex) {
+        // Parcourez chaque TableRow dans le TableLayout pour trouver la catégorie correspondante
+        for (int i = 0; i < scoreTableLayout.getChildCount(); i++) {
+            View view = scoreTableLayout.getChildAt(i);
+            if (view instanceof TableRow) {
+                TableRow row = (TableRow) view;
+                TextView categoryView = (TextView) row.getChildAt(0); // La catégorie est dans la première cellule
+                if (category.equalsIgnoreCase(categoryView.getText().toString())) {
+                    // Assurez-vous d'ajuster l'index pour correspondre à l'emplacement réel de la cellule du joueur dans la TableRow
+                    // L'index du joueur dans la UI commence généralement après la cellule de la catégorie, donc +1
+                    TextView scoreView = (TextView) row.getChildAt(playerIndex + 1);
+                    scoreView.setText(String.valueOf(score));
+                    break; // Sortez de la boucle une fois la catégorie trouvée et le score mis à jour
+                }
+            }
+        }
     }
+
 
     private void resetForNextTurn() {
         Arrays.fill(diceToKeep, false);
         Arrays.fill(diceValues, 0);
         launchCount = 0;
         rollDiceButton.setEnabled(true);
-        validateSelectionButton.setEnabled(false);
+        //validateSelectionButton.setEnabled(false);
         updateDiceImages();
         launchCounterTextView.setText("Lancers: 0");
     }
