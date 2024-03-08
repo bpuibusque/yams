@@ -1,16 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Style pour les cellules du tableau -->
     <style name="TableCellStyle">
-        <item name="android:layout_margin">4dp</item> <!-- Augmenter l'espacement -->
-        <item name="android:padding">12dp</item> <!-- Augmenter le padding pour un texte plus aéré -->
-        <item name="android:textSize">18sp</item> <!-- Taille de la police agrandie -->
+        <item name="android:textSize">16sp</item> <!-- Agrandir la police -->
+        <item name="android:padding">16dp</item>
+        <item name="android:paddingStart">24dp</item> <!-- Ajouter de l'espace au début du texte -->
+        <item name="android:paddingEnd">24dp</item> <!-- Ajouter de l'espace à la fin du texte -->
         <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/table_cell_background</item> <!-- Optionnel: pour ajouter un fond à chaque cellule -->
     </style>
 
+    <!-- Style pour les en-têtes du tableau -->
     <style name="TableHeaderStyle">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">20sp</item> <!-- Police plus grande pour les en-têtes -->
+        <item name="android:textSize">16sp</item> <!-- Agrandir la police pour les en-têtes -->
+        <item name="android:padding">16dp</item> <!-- Espace autour des en-têtes -->
+        <item name="android:paddingStart">24dp</item> <!-- Espace supplémentaire au début pour les en-têtes -->
+        <item name="android:paddingEnd">24dp</item> <!-- Espace supplémentaire à la fin pour les en-têtes -->
+        <item name="android:textStyle">bold</item> <!-- Mettre le texte en gras -->
+        <item name="android:gravity">center</item>
     </style>
-
 </resources>

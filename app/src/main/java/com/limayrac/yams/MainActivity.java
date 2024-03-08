@@ -31,6 +31,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button recordBouton = findViewById(R.id.records);
+        recordBouton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RecordsActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 

@@ -1,54 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <!-- Fond d'écran -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-        <TableLayout
-            android:id="@+id/scoreTableLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </ScrollView>
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/jeu_fond_couleur_127657_11045" />
 
+    <!-- Conteneur principal -->
     <LinearLayout
-        android:id="@+id/diceImagesLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="16dp">
-        <!-- Les images des dés seront ajoutées ici dynamiquement -->
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Tableau des scores agrandi -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <TableLayout
+                android:id="@+id/scoreTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp" /> <!-- Ajustez la taille du texte ici -->
+        </ScrollView>
+
+        <!-- Conteneur pour les dés -->
+        <LinearLayout
+            android:id="@+id/diceImagesLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="16dp">
+            <!-- Les images des dés seront ajoutées ici dynamiquement -->
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/launchCounterTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lancers: 0"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/rollDiceButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lancer les dés"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+
     </LinearLayout>
-
-
-    <TextView
-        android:id="@+id/launchCounterTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lancers: 0"
-        android:gravity="center"
-        android:textSize="18sp"
-        android:layout_marginTop="10dp"/>
-
-    <Button
-        android:id="@+id/rollDiceButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lancer les dés"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
-
-    <Button
-        android:id="@+id/validateSelectionButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Valider la sélection"
-        android:layout_marginBottom="10dp"
-        android:enabled="false"/>
-
-</LinearLayout>
+</FrameLayout>
