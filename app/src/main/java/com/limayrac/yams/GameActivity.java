@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.SharedPreferences;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -42,12 +41,16 @@ public class GameActivity extends AppCompatActivity {
     private LinearLayout diceContainer;
     private TableLayout scoreTableLayout;
 
+    private int currentPlayer = 0;
+    private int numberOfPlayers;
+    private boolean scoreSelected = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        int numberOfPlayers = getIntent().getIntExtra("numberOfPlayers", 1);
+        numberOfPlayers = getIntent().getIntExtra("numberOfPlayers", 1);
 
         initializeUI();
         setupDiceImages();
@@ -59,27 +62,30 @@ public class GameActivity extends AppCompatActivity {
         scoreTableLayout = findViewById(R.id.scoreTableLayout);
         launchCounterTextView = findViewById(R.id.launchCounterTextView);
         rollDiceButton = findViewById(R.id.rollDiceButton);
-        //validateSelectionButton = findViewById(R.id.validateSelectionButton);
 
         rollDiceButton.setOnClickListener(v -> rollDice());
-        //validateSelectionButton.setOnClickListener(v -> validateSelection());
-        //validateSelectionButton.setEnabled(false);
+
+
     }
     private void rollDice() {
+        if (launchCount == 0) {
+            for (ImageView diceImage : diceImages) {
+                diceImage.setVisibility(View.VISIBLE);
+            }
+        }
         if (launchCount < MAX_LAUNCHES) {
             for (int i = 0; i < 5; i++) {
                 if (!diceToKeep[i]) {
-                    diceValues[i] = random.nextInt(6) + 1; // Générer de nouveaux nombres pour les dés non conservés
+                    diceValues[i] = random.nextInt(6) + 1;
                 }
             }
             launchCount++;
-            updateDiceImages(); // Met à jour l'affichage des dés avec les nouvelles valeurs
+            updateDiceImages();
             launchCounterTextView.setText("Lancers: " + launchCount);
         }
 
         if (launchCount == MAX_LAUNCHES) {
-            rollDiceButton.setEnabled(false); // Désactive le bouton après le nombre maximum de lancers
-           // validateSelectionButton.setEnabled(true); // Active le bouton de validation pour permettre le choix du score
+            rollDiceButton.setEnabled(false);
         }
     }
 
@@ -93,22 +99,18 @@ public class GameActivity extends AppCompatActivity {
     private void toggleDiceSelection(int index) {
         diceToKeep[index] = !diceToKeep[index];
         updateDiceAppearance(index);
-        // Ajoutez un log ou un Toast ici pour tester
-        Toast.makeText(this, "Dé " + (index + 1) + (diceToKeep[index] ? " sélectionné" : " désélectionné"), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Dé " + (index + 1) + (diceToKeep[index] ? " sélectionné" : " désélectionné"), Toast.LENGTH_SHORT).show();
     }
 
 
     private void updateDiceAppearance(int index) {
         ImageView diceImage = diceImages[index];
         if (diceToKeep[index]) {
-            // Appliquez l'encadrement pour indiquer la sélection
-            diceImage.setBackgroundResource(R.drawable.selected_dice_border);
+            diceImage.setBackgroundResource(R.drawable.selected_dice_border); // Dés sélectionnés
         } else {
-            // Retirez l'encadrement pour indiquer la désélection
-            diceImage.setBackground(null); // Utilisez setBackgroundDrawable(null) pour les versions antérieures
+            diceImage.setBackground(null); // Dés non sélectionnés
         }
 
-        // Assurez-vous que les paramètres de mise en page restent constants
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 getResources().getDimensionPixelSize(R.dimen.dice_size),
                 getResources().getDimensionPixelSize(R.dimen.dice_size));
@@ -117,23 +119,19 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-
-
     private void setupDiceImages() {
         diceContainer = findViewById(R.id.diceImagesLayout);
 
-        // Création dynamique des ImageView pour chaque dé
         for (int i = 0; i < diceImages.length; i++) {
             ImageView diceImage = new ImageView(this);
             diceImage.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
             diceImage.setAdjustViewBounds(true);
-            diceImage.setMaxHeight(100); // Taille maximale de l'image du dé
+            diceImage.setMaxHeight(100);
             diceImage.setMaxWidth(100);
-            // Définir une image par défaut pour le dé
-            diceImage.setImageResource(R.drawable.dice_face_1); // Image par défaut
-            int finalI = i; // Nécessaire pour être utilisé dans une expression lambda
+            diceImage.setImageResource(R.drawable.dice_face_1);
+            int finalI = i;
             diceImage.setOnClickListener(v -> toggleDiceSelection(finalI));
             diceContainer.addView(diceImage);
             diceImages[i] = diceImage;
@@ -142,11 +140,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setupScoreTable(int numberOfPlayers) {
-        scoreTableLayout.removeAllViews(); // Nettoyez le tableau avant de le remplir
+        scoreTableLayout.removeAllViews();
 
-        // Ajoutez une ligne d'en-tête pour les joueurs, si nécessaire
         TableRow playerHeaderRow = new TableRow(this);
-        TextView emptyCornerView = new TextView(this); // Coin vide pour l'alignement
+        TextView emptyCornerView = new TextView(this);
         applyStyle(emptyCornerView, "TableHeaderStyle");
         playerHeaderRow.addView(emptyCornerView);
 
@@ -155,7 +152,7 @@ public class GameActivity extends AppCompatActivity {
             playerHeaderView.setText("J" + i);
             applyStyle(playerHeaderView, "TableHeaderStyle");
             playerHeaderRow.addView(playerHeaderView);
-            playerHeaderView.setBackgroundResource(R.drawable.table_cell_clickable_background); // Style par défaut
+            playerHeaderView.setBackgroundResource(R.drawable.table_cell_clickable_background);
             playerHeaderView.setTextAppearance(this, R.style.TableCellStyle);
         }
         scoreTableLayout.addView(playerHeaderRow);
@@ -175,32 +172,31 @@ public class GameActivity extends AppCompatActivity {
             TextView textView = new TextView(this);
             textView.setText(category);
             textView.setGravity(Gravity.CENTER);
-            textView.setPadding(8, 8, 8, 8); // Augmenter le padding pour un espace visible
+            textView.setPadding(8, 8, 8, 8);
 
             if (Arrays.asList("Total", "Bonus", "Total intermédiaire", "Total final").contains(category)) {
-                textView.setBackgroundResource(R.drawable.cell_background_score_set); // Style pour les catégories calculées automatiquement
+                textView.setBackgroundResource(R.drawable.cell_background_score_set);
                 textView.setTextAppearance(this, R.style.TableHeaderStyle);
             } else {
-                textView.setBackgroundResource(R.drawable.table_cell_clickable_background); // Style par défaut
+                textView.setBackgroundResource(R.drawable.table_cell_clickable_background);
                 textView.setTextAppearance(this, R.style.TableCellStyle);
             }
             row.addView(textView);
 
             for (int i = 0; i < numberOfPlayers; i++) {
                 final TextView scoreView = new TextView(this);
-                scoreView.setText("0"); // Initialisation avec 0
+                scoreView.setText("0");
                 scoreView.setGravity(Gravity.CENTER);
-                scoreView.setPadding(8, 8, 8, 8); // Augmenter le padding pour un espace visible
-                scoreView.setBackgroundResource(R.drawable.table_cell_clickable_background); // Style par défaut
-                scoreView.setTextAppearance(this, R.style.TableCellStyle);
+                scoreView.setPadding(8, 8, 8, 8);
+                scoreView.setBackgroundResource(R.drawable.table_cell_clickable_background);
 
                 if (!Arrays.asList("Total", "Bonus", "Total intermédiaire", "Total final").contains(category)) {
-                    scoreView.setBackgroundResource(R.drawable.table_cell_clickable_background); // Style par défaut pour les cellules cliquables
+                    scoreView.setBackgroundResource(R.drawable.table_cell_clickable_background);
                     final String finalCategory = category;
                     final int finalI = i;
                     scoreView.setOnClickListener(v -> onScoreCellClicked(finalCategory, finalI, scoreView));
                 } else {
-                    scoreView.setBackgroundResource(R.drawable.cell_background_score_set); // Catégories automatiques non cliquables
+                    scoreView.setBackgroundResource(R.drawable.cell_background_score_set);
                     scoreView.setClickable(false);
                 }
                 row.addView(scoreView);
@@ -219,7 +215,6 @@ public class GameActivity extends AppCompatActivity {
                 textView.setTextAppearance(context, styleId);
             }
         }
-        // Appliquer manuellement le padding
         final float scale = context.getResources().getDisplayMetrics().density;
         int paddingInPx = (int) (16 * scale + 0.5f);
         textView.setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx);
@@ -227,94 +222,103 @@ public class GameActivity extends AppCompatActivity {
 
 
 
-    private void updateAutomaticScores() {
-        int totalScore = 0; // Pour les scores des catégories "1" à "6"
-        int bonus = 0; // Bonus accordé
-        int totalIntermediate = 0; // Total intermédiaire incluant le bonus
-        int totalFinal = 0; // Total final incluant tous les scores
 
-        // Calculer le total des scores pour les catégories "1" à "6"
-        for (int i = 1; i <= 6; i++) { // Suppose que les scores "1" à "6" sont dans les 6 premières lignes
+
+    private void updateScoresForPlayer() {
+        int totalScore = 0;
+        for (int i = 1; i <= 6; i++) {
             TableRow row = (TableRow) scoreTableLayout.getChildAt(i);
-            for (int j = 1; j < row.getChildCount(); j++) { // Commence à 1 pour ignorer la colonne de l'en-tête de catégorie
-                View view = row.getChildAt(j);
-                if (view instanceof TextView) {
-                    TextView scoreView = (TextView) view;
-                    try {
-                        totalScore += Integer.parseInt(scoreView.getText().toString());
-                    } catch (NumberFormatException e) {
-                        // Ignorer si le texte n'est pas un nombre
-                    }
-                }
+            TextView scoreView = (TextView) row.getChildAt(currentPlayer + 1);
+            try {
+                totalScore += Integer.parseInt(scoreView.getText().toString());
+            } catch (NumberFormatException e) {
+                // Ignorer l'exception si le texte n'est pas un nombre valide
             }
         }
+        int bonus = totalScore >= 63 ? 35 : 0;
+        int totalIntermediate = totalScore + bonus;
 
-        // Calculer le bonus
-        bonus = totalScore >= 63 ? 35 : 0;
+        // Mise à jour des scores intermédiaires pour le joueur actuel
+        updateScoreViewByText("Total", currentPlayer + 1, String.valueOf(totalScore));
+        updateScoreViewByText("Bonus", currentPlayer + 1, String.valueOf(bonus));
+        updateScoreViewByText("Total intermédiaire", currentPlayer + 1, String.valueOf(totalIntermediate));
 
-        // Total intermédiaire est le total des scores "1" à "6" plus le bonus
-        totalIntermediate = totalScore + bonus;
-
-        // Calculer le total final en incluant les scores de toutes les autres catégories
-        for (int i = 7; i < scoreTableLayout.getChildCount(); i++) { // Ignorer les lignes d'en-tête et de bonus
-            TableRow row = (TableRow) scoreTableLayout.getChildAt(i);
-            for (int j = 1; j < row.getChildCount(); j++) {
-                View view = row.getChildAt(j);
-                if (view instanceof TextView && !row.getChildAt(0).toString().equals("Total final")) { // Vérifier si ce n'est pas la ligne "Total final"
-                    TextView scoreView = (TextView) view;
-                    try {
-                        totalFinal += Integer.parseInt(scoreView.getText().toString());
-                    } catch (NumberFormatException e) {
-                        // Ignorer ou gérer l'exception
-                    }
-                }
-            }
-        }
-
-        // Total final inclut les scores de toutes les catégories plus le total intermédiaire
-        totalFinal += totalIntermediate;
-
-        // Mettre à jour l'UI avec les nouveaux totaux
-        updateScoreViewByText("Total", String.valueOf(totalScore));
-        updateScoreViewByText("Bonus", String.valueOf(bonus));
-        updateScoreViewByText("Total intermédiaire", String.valueOf(totalIntermediate));
-        updateScoreViewByText("Total final", String.valueOf(totalFinal));
+        // Le calcul du "Total final" est maintenant déplacé dans sa propre méthode pour éviter les conflits
+        updateTotalFinal();
     }
 
-
-
-
-    private void updateScoreViewByText(String categoryText, String score) {
+    private void updateScoreViewByText(String category, int playerColumn, String score) {
         for (int i = 0; i < scoreTableLayout.getChildCount(); i++) {
             TableRow row = (TableRow) scoreTableLayout.getChildAt(i);
-            TextView categoryView = (TextView) row.getChildAt(0); // La catégorie est toujours dans la première cellule
-            if (categoryText.equals(categoryView.getText().toString())) {
-                TextView scoreView = (TextView) row.getChildAt(1); // Supposons 1 joueur pour simplifier
+            TextView categoryView = (TextView) row.getChildAt(0);
+            if (category.equals(categoryView.getText().toString())) {
+                TextView scoreView = (TextView) row.getChildAt(playerColumn);
                 scoreView.setText(score);
-                break; // Sortir de la boucle après la mise à jour
+                return; // Sortie anticipée une fois le score mis à jour
             }
         }
+    }
+
+    private void updateTotalFinal() {
+        for (int playerIndex = 1; playerIndex <= numberOfPlayers; playerIndex++) {
+            int totalIntermediateIndex = findCategoryIndex("Total intermédiaire");
+            int totalFinal = 0;
+
+            // Si l'index de "Total intermédiaire" est trouvé, commencer à calculer à partir de là
+            if (totalIntermediateIndex != -1) {
+                for (int i = totalIntermediateIndex; i < scoreTableLayout.getChildCount() - 1; i++) {
+                    // Exclure "Total final" de la boucle en s'arrêtant juste avant
+                    TableRow row = (TableRow) scoreTableLayout.getChildAt(i);
+                    TextView scoreView = (TextView) row.getChildAt(playerIndex);
+
+                    String scoreText = scoreView.getText().toString();
+                    if (!scoreText.isEmpty()) {
+                        try {
+                            totalFinal += Integer.parseInt(scoreText);
+                        } catch (NumberFormatException e) {
+                            // Ignorer si le texte n'est pas un nombre valide
+                        }
+                    }
+                }
+            }
+
+            // Mettre à jour le "Total final" pour le joueur actuel
+            TableRow finalRow = (TableRow) scoreTableLayout.getChildAt(scoreTableLayout.getChildCount() - 1);
+            TextView finalScoreView = (TextView) finalRow.getChildAt(playerIndex);
+            finalScoreView.setText(String.valueOf(totalFinal));
+        }
+    }
+
+    private int findCategoryIndex(String category) {
+        for (int i = 0; i < scoreTableLayout.getChildCount(); i++) {
+            TableRow row = (TableRow) scoreTableLayout.getChildAt(i);
+            TextView categoryView = (TextView) row.getChildAt(0);
+            if (category.equals(categoryView.getText().toString())) {
+                return i; // Retourne l'index de la catégorie recherchée
+            }
+        }
+        return -1; // Retourne -1 si la catégorie n'est pas trouvée
     }
 
 
 
     private void onScoreCellClicked(String category, int playerIndex, TextView scoreView) {
-        if (!scoreView.isClickable()) return; // Si la vue n'est pas cliquable, sortez de la méthode.
+        if (!scoreView.isClickable()) return;
 
         final int potentialScore = calculateScoreForCategory(category, diceValues);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirmer le score");
-        builder.setMessage("Voulez-vous ajouter " + potentialScore + " points à " + category + " pour le joueur " + (playerIndex + 1) + "?");
-        builder.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                scoreView.setText(String.valueOf(potentialScore));
-                scoreView.setClickable(false); // Rendre la cellule non cliquable après la mise à jour du score.
-                scoreView.setBackgroundResource(R.drawable.cell_background_score_set); // Changez le fond pour indiquer que le score est fixé.
-                updateScoreInTable(category, potentialScore, playerIndex);
-                updateAutomaticScores(); // Mettez à jour les scores automatiques après chaque changement.
-                resetForNextTurn();
-            }
+        builder.setMessage("Voulez-vous ajouter " + potentialScore + " points à " + category + " pour le joueur " + (currentPlayer + 1) + "?");
+        builder.setPositiveButton("Oui", (dialogInterface, i) -> {
+            scoreView.setText(String.valueOf(potentialScore));
+            scoreView.setClickable(false); // Rendre la cellule non cliquable après la mise à jour du score.
+            scoreView.setBackgroundResource(R.drawable.cell_background_score_set); // Changez le fond pour indiquer que le score est fixé.
+            updateScoreInTable(category, potentialScore, currentPlayer);
+            updateScoresForPlayer();
+            scoreSelected = true; // Indique qu'un score a été sélectionné.
+
+            // Ajoutez ici la logique pour passer au joueur suivant si cela est conforme à vos règles.
+            prepareForNextPlayer();
         });
         builder.setNegativeButton("Non", (dialogInterface, i) -> dialogInterface.dismiss());
         builder.show();
@@ -322,7 +326,7 @@ public class GameActivity extends AppCompatActivity {
 
 
 
-    // Vérification des différentes combinaisons
+
     private boolean hasFullHouse() {
         Map<Integer, Integer> diceCounts = new HashMap<>();
         for (int value : diceValues) {
@@ -339,7 +343,44 @@ public class GameActivity extends AppCompatActivity {
         return hasThreeOfAKind && hasPair;
     }
 
-    // Calcul des scores pour chaque catégorie
+    private boolean hasYams() {
+        Map<Integer, Integer> diceCount = new HashMap<>();
+        for (int value : diceValues) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                diceCount.put(value, diceCount.getOrDefault(value, 0) + 1);
+            }
+        }
+        return diceCount.containsValue(5);
+    }
+
+    private boolean hasSmallStraight(int[] diceValues) {
+        Arrays.sort(diceValues);
+        int consecutiveCount = 1;
+        for (int i = 1; i < diceValues.length; i++) {
+            if (diceValues[i] - diceValues[i - 1] == 1) {
+                consecutiveCount++;
+                if (consecutiveCount >= 4) {
+                    return true;
+                }
+            } else if (diceValues[i] != diceValues[i - 1]) {
+                consecutiveCount = 1;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasLargeStraight(int[] diceValues) {
+        Arrays.sort(diceValues);
+        for (int i = 1; i < diceValues.length; i++) {
+            if (diceValues[i] - diceValues[i - 1] != 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
     private int calculateScoreForCategory(String category, int[] diceValues) {
         switch (category) {
             case "Full House":
@@ -348,21 +389,22 @@ public class GameActivity extends AppCompatActivity {
                 return calculateTotalForNOfAKind(3);
             case "Carré":
                 return calculateTotalForNOfAKind(4);
-            case "Yam's":
-                return calculateTotalForNOfAKind(5) > 0 ? 50 : 0;
+            case "Yam":
+                return hasYams() ? 50 : 0;
+            case "Petite Suite":
+                return hasSmallStraight(diceValues) ? 30 : 0;
+            case "Grande Suite":
+                return hasLargeStraight(diceValues) ? 40 : 0;
+
             case "Chance":
-                // Pour "Chance", on additionne simplement toutes les valeurs des dés
                 return calculateTotalOfChance(diceValues);
-            // Ajoutez ici la logique pour d'autres catégories si nécessaire
             default:
-                // Pour les scores simples (1 à 6)
                 try {
                     int number = Integer.parseInt(category);
                     if (number >= 1 && number <= 6) {
                         return calculateTotalOfNumber(number, diceValues);
                     }
                 } catch (NumberFormatException e) {
-
                 }
                 return 0;
         }
@@ -376,8 +418,6 @@ public class GameActivity extends AppCompatActivity {
         return total;
     }
 
-
-    // Calcul du score pour les N dés identiques
     private int calculateTotalForNOfAKind(int N) {
         Map<Integer, Integer> counts = new HashMap<>();
         for (int value : diceValues) {
@@ -395,7 +435,6 @@ public class GameActivity extends AppCompatActivity {
         return 0;
     }
 
-    // Calcul du score pour les dés avec la valeur spécifiée
     private int calculateTotalOfNumber(int number, int[] diceValues) {
         int total = 0;
         for (int value : diceValues) {
@@ -406,13 +445,12 @@ public class GameActivity extends AppCompatActivity {
         return total;
     }
 
-
     private void updateScoreInTable(String category, int score, int playerIndex) {
         for (int i = 0; i < scoreTableLayout.getChildCount(); i++) {
             TableRow row = (TableRow) scoreTableLayout.getChildAt(i);
             TextView categoryView = (TextView) row.getChildAt(0);
             if (category.equalsIgnoreCase(categoryView.getText().toString())) {
-                TextView scoreView = (TextView) row.getChildAt(playerIndex + 1); // +1 car la première cellule est le nom de la catégorie
+                TextView scoreView = (TextView) row.getChildAt(playerIndex + 1);
                 scoreView.setText(String.valueOf(score));
                 break;
             }
@@ -422,73 +460,147 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void resetForNextTurn() {
+        Arrays.fill(diceToKeep, false);
+        Arrays.fill(diceValues, 0);
 
-        Arrays.fill(diceToKeep, false); // Réinitialisez le suivi des dés à conserver
-        Arrays.fill(diceValues, 0); // Réinitialisez les valeurs des dés
-        launchCount = 0; // Réinitialisez le compteur de lancers
-        rollDiceButton.setEnabled(true); // Réactivez le bouton de lancer
+        // Réinitialiser le compteur de lancers
+        launchCount = 0;
+        rollDiceButton.setEnabled(true); // Réactive le bouton pour lancer les dés
+        scoreSelected = false; // Réinitialise la sélection de score
 
-        // Réinitialisez l'apparence de chaque dé
+        // Mise à jour de l'apparence des dés et de leur valeur affichée
         for (int i = 0; i < diceImages.length; i++) {
-            updateDiceAppearance(i); // Cette méthode réinitialisera l'encadrement
+            updateDiceAppearance(i); // Met à jour l'apparence visuelle des dés
+            updateDiceValueDisplay(i); // Met à jour l'affichage des valeurs des dés
         }
 
+        // Mise à jour du texte indiquant le nombre de lancers
         launchCounterTextView.setText("Lancers: 0");
     }
 
-    private void checkForEndGame() {
-        boolean isGameFinished = true;
-        int highestScore = 0;
-        int winningPlayerIndex = -1;
+    private void updateDiceValueDisplay(int index) {
+        int resId = getResources().getIdentifier("dice_face_" + diceValues[index], "drawable", getPackageName());
+        diceImages[index].setImageResource(resId);
+    }
 
-        // Supposer que le score total final est dans la dernière ligne pour chaque joueur
-        TableRow finalRow = (TableRow) scoreTableLayout.getChildAt(scoreTableLayout.getChildCount() - 1);
-        for (int i = 1; i < finalRow.getChildCount(); i++) {
-            TextView scoreView = (TextView) finalRow.getChildAt(i);
-            int playerScore = Integer.parseInt(scoreView.getText().toString());
-            if (playerScore > highestScore) {
-                highestScore = playerScore;
-                winningPlayerIndex = i;
+    private void checkForEndGame() {
+        // Vérifier si toutes les cellules de score sont non cliquables ou non initialisées (-1)
+        boolean allScoresFinalized = true;
+        for (int rowIndex = 0; rowIndex < scoreTableLayout.getChildCount() - 1; rowIndex++) { // Exclure le "Total final"
+            TableRow row = (TableRow) scoreTableLayout.getChildAt(rowIndex);
+            TextView categoryView = (TextView) row.getChildAt(0);
+
+            // Ignorer les lignes de total qui sont calculées automatiquement
+            if (Arrays.asList("Total", "Bonus", "Total intermédiaire", "Total final").contains(categoryView.getText().toString())) {
+                continue;
+            }
+
+            for (int colIndex = 1; colIndex < row.getChildCount(); colIndex++) {
+                TextView scoreView = (TextView) row.getChildAt(colIndex);
+                if (scoreView.isClickable() || "-1".equals(scoreView.getText().toString())) {
+                    allScoresFinalized = false;
+                    break;
+                }
+            }
+            if (!allScoresFinalized) {
+                break;
             }
         }
 
-
-        if (isGameFinished && winningPlayerIndex != -1) {
-            showWinnerDialog(winningPlayerIndex, highestScore);
+        if (allScoresFinalized) {
+            // Tous les scores ont été finalisés, procéder à déterminer le gagnant et fin de jeu
+            determineWinnerAndEndGame();
         }
     }
+
+    private void determineWinnerAndEndGame() {
+        // Logique pour déterminer le gagnant et afficher le dialogue de fin de partie
+        int highestScore = 0;
+        int winningPlayerIndex = 0; // Assumer le premier joueur comme gagnant par défaut
+        for (int playerIndex = 1; playerIndex <= numberOfPlayers; playerIndex++) {
+            TableRow finalRow = (TableRow) scoreTableLayout.getChildAt(scoreTableLayout.getChildCount() - 1);
+            TextView scoreView = (TextView) finalRow.getChildAt(playerIndex);
+            int score = Integer.parseInt(scoreView.getText().toString());
+            if (score > highestScore) {
+                highestScore = score;
+                winningPlayerIndex = playerIndex;
+            }
+        }
+        showWinnerDialog(winningPlayerIndex, highestScore);
+    }
+
+
+    private void prepareForNextPlayer() {
+        currentPlayer = (currentPlayer + 1) % numberOfPlayers;
+        launchCount = 0; // Réinitialiser le compteur de lancers pour le nouveau joueur
+        launchCounterTextView.setText("Lancers: " + launchCount); // Mettre à jour l'affichage du nombre de lancers
+        rollDiceButton.setEnabled(true); // Réactiver le bouton de lancement des dés
+        scoreSelected = false; // Réinitialiser l'indicateur de sélection de score pour le nouveau joueur
+
+        // Cacher les images des dés et réinitialiser la sélection
+        for (int i = 0; i < diceImages.length; i++) {
+            diceImages[i].setVisibility(View.INVISIBLE); // Utiliser INVISIBLE ou GONE selon la préférence
+            diceToKeep[i] = false; // Réinitialiser la sélection des dés
+            updateDiceAppearance(i); // Mettre à jour l'apparence pour refléter la réinitialisation
+        }
+
+        updateCurrentPlayerIndicator(currentPlayer);
+
+        if (currentPlayer == 0) {
+            checkForEndGame();
+        } else {
+            resetForNextTurn();
+        }
+    }
+
+
+
+
+    private void updateCurrentPlayerIndicator(int currentPlayer) {
+        TextView currentPlayerIndicator = findViewById(R.id.currentPlayerIndicator);
+        currentPlayerIndicator.setText("Joueur " + (currentPlayer + 1));
+    }
+
+
+
+    private boolean allScoresFilled() {
+        for (int rowIndex = 0; rowIndex < scoreTableLayout.getChildCount(); rowIndex++) {
+            TableRow scoreRow = (TableRow) scoreTableLayout.getChildAt(rowIndex);
+            for (int colIndex = 1; colIndex < scoreRow.getChildCount(); colIndex++) {
+                TextView scoreView = (TextView) scoreRow.getChildAt(colIndex);
+                String scoreText = scoreView.getText().toString();
+                // Considérer une case comme non remplie si sa valeur est toujours "-1"
+                if ("-1".equals(scoreText)) {
+                    return false;
+                }
+            }
+        }
+        return true; // Toutes les cases ont été remplies (ou marquées avec un score)
+    }
+
 
     private void showWinnerDialog(final int playerIndex, int score) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Félicitations, Joueur " + playerIndex + "!");
-
-        // Ajouter un champ de texte à l'AlertDialog pour saisir le nom
         final EditText input = new EditText(this);
         builder.setView(input);
-
         builder.setMessage("Vous avez le score le plus élevé de " + score + " points. Entrez votre nom pour le record :");
         builder.setPositiveButton("OK", (dialog, which) -> {
             String playerName = input.getText().toString();
             saveHighScore(playerName, score);
         });
         builder.setNegativeButton("Annuler", (dialog, which) -> dialog.cancel());
-
         builder.show();
     }
 
     private void saveHighScore(String playerName, int score) {
         SharedPreferences prefs = getSharedPreferences("GameRecords", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        // Sauvegardez le score avec le nom du joueur comme clé
         editor.putInt(playerName, score);
         editor.apply();
-
         Intent intent = new Intent(this, RecordsActivity.class);
         startActivity(intent);
-
-
     }
-
 
 
 }
